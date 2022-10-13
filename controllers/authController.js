@@ -34,9 +34,7 @@ export const login = (req, res) => {
   User.findOne({ email: req.body.email })
     .then((user) => {
       if (!user) {
-        return res
-          .status(401)
-          .json({ message: "Login/mot de passe incorrects !" });
+        return res.status(401).json({ error: "L'utilisateur n'existe pas !" });
       }
       bcrypt
         .compare(req.body.password, user.password)
@@ -44,7 +42,7 @@ export const login = (req, res) => {
           if (!valid) {
             return res
               .status(401)
-              .json({ message: "Login/mot de passe incorrects !" });
+              .json({ message: "Mot de passe incorrect !" });
           }
           res.status(200).json({
             userId: user._id,
@@ -55,7 +53,7 @@ export const login = (req, res) => {
             ),
           });
         })
-        .catch((err) => res.status(500).json({ err }));
+        .catch((error) => res.status(500).json({ error }));
     })
-    .catch((err) => res.status(500).json({ err }));
+    .catch((error) => res.status(500).json({ error }));
 };
