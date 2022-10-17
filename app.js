@@ -1,5 +1,7 @@
 import express from "express";
+import helmet from "helmet";
 import dotenv from "dotenv";
+import * as fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -9,7 +11,6 @@ import { saucesRoutes } from "./routes/saucesRoutes.js";
 
 /* Import MongoDB connection */
 import { ConnectDB } from "./config/database.js";
-import * as fs from "fs";
 
 /* fix filename and dirname for type module nodejs */
 const __filename = fileURLToPath(import.meta.url);
@@ -17,6 +18,7 @@ const __dirname = path.dirname(__filename);
 
 /* Create a new instance of express */
 const app = new express();
+app.use(helmet());
 
 /* Config path for Environments Variables */
 dotenv.config({ path: ".env" });
