@@ -63,8 +63,8 @@ app.use((req, res, next) => {
 });
 
 /* Checks if the Images folder exists, if not creates this folder .*/
-fs.access("images", function (error) {
-  if (error) {
+fs.access("images", function (notAccess) {
+  if (notAccess) {
     fs.mkdir(path.join(__dirname, "images"), (err) => {
       if (err) {
         return console.log(err);

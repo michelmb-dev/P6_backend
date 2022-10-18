@@ -34,15 +34,13 @@ export const login = (req, res) => {
   User.findOne({ email: req.body.email })
     .then((user) => {
       if (!user) {
-        return res.status(401).json({ error: "L'utilisateur n'existe pas !" });
+        return res.status(401).json({ error: "The user does not exist !!!" });
       }
       bcrypt
         .compare(req.body.password, user.password)
         .then((valid) => {
           if (!valid) {
-            return res
-              .status(401)
-              .json({ message: "Mot de passe incorrect !" });
+            return res.status(401).json({ message: "Incorrect password !!!" });
           }
           res.status(200).json({
             userId: user._id,

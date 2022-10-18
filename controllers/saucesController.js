@@ -1,11 +1,6 @@
 import { Sauce } from "../models/Sauce.js";
 import * as fs from "fs";
 
-/**
- * It creates a new sauce in the database
- * @param req - the request object
- * @param res - the response object
- */
 export const createSauce = (req, res) => {
   const { sauce } = req.body;
   const sauceObject = JSON.parse(sauce);
@@ -25,26 +20,18 @@ export const createSauce = (req, res) => {
 
   newSauce
     .save()
-    .then(() => res.status(201).json({ message: "Sauce enregistrée" }))
+    .then(() =>
+      res.status(201).json({ message: "Sauce successfully registered." })
+    )
     .catch((error) => res.status(400).json({ error }));
 };
 
-/**
- * It finds all the sauces in the database and returns them in the response
- * @param req - the request object
- * @param res - the response object that will be sent back to the client
- */
 export const getAllSauces = (req, res) => {
   Sauce.find()
     .then((sauces) => res.status(200).json(sauces))
     .catch((error) => res.status(500).json({ error: error }));
 };
 
-/**
- * It finds a sauce in the database by its id and returns it
- * @param req - the request object
- * @param res - the response that will be sent to the client
- */
 export const getSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
@@ -57,12 +44,6 @@ export const getSauce = (req, res) => {
     .catch((error) => res.status(500).json({ error: error }));
 };
 
-/**
- * It updates the sauce in the database with the new sauce object, and if the user uploaded a new image, it deletes the old
- * image from the server
- * @param req - The request object.
- * @param res - The response object.
- */
 export const updateSauce = (req, res) => {
   const { sauce } = req.body;
 
@@ -78,15 +59,16 @@ export const updateSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId !== req.auth.userId) {
-        res.status(403).json({ message: "Non autorisé !" });
+        res.status(403).json({ message: "Unauthorized !!!" });
       } else {
         /* This is deleting the old image from the server. */
+        const oldImage = sauce.imageUrl.split("/images/")[1];
         if (req.file) {
-          const oldImage = sauce.imageUrl.split("/images/")[1];
           fs.rm(`images/${oldImage}`, (err) => {
             if (err) {
               // File deletion failed
-              console.error(err.message);
+              // TODO => gérer l'erreur de suppression d'image
+              console.error("Error while removing the image");
             }
           });
         }
@@ -94,7 +76,9 @@ export const updateSauce = (req, res) => {
           { _id: req.params.id },
           { ...sauceObject, _id: req.params.id }
         )
-          .then(() => res.status(200).json({ message: "Sauce Mise à jour." }))
+          .then(() =>
+            res.status(200).json({ message: "Sauce updated successfully." })
+          )
           .catch((error) => res.status(500).json({ error }));
       }
     })
@@ -103,12 +87,6 @@ export const updateSauce = (req, res) => {
     });
 };
 
-/**
- * It deletes the sauce whose id is passed in the request parameters, but only if the user who made the request is the same
- * as the one who created the sauce
- * @param req - the request object
- * @param res - the response object
- */
 export const deleteSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
@@ -118,7 +96,9 @@ export const deleteSauce = (req, res) => {
         const filename = sauce.imageUrl.split("/images/")[1];
         fs.rm(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
-            .then(() => res.status(200).json({ message: "Sauce supprimée !" }))
+            .then(() =>
+              res.status(200).json({ message: "Sauce successfully removed." })
+            )
             .catch((error) => res.status(500).json({ error }));
         });
       }
@@ -126,13 +106,6 @@ export const deleteSauce = (req, res) => {
     .catch((error) => res.status(500).json({ error }));
 };
 
-/**
- * It checks if the user has already liked or disliked the sauce, and if so, it removes the user from the array of users
- * who liked or disliked the sauce. If the user hasn't liked or disliked the sauce, it adds the user to the array of users
- * who liked or disliked the sauce
- * @param req - the request object
- * @param res - the response object
- */
 export const likeSauce = (req, res) => {
   const { like } = req.body;
 

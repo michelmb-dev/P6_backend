@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongooseErrors from "mongoose-errors";
 
 /* This is creating a schema for the sauce model. */
 const sauceSchema = new mongoose.Schema({
@@ -44,5 +45,7 @@ const sauceSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+sauceSchema.plugin(mongooseErrors);
 
 export const Sauce = mongoose.model("Sauce", sauceSchema);
