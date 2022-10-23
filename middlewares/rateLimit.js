@@ -1,8 +1,6 @@
 import rateLimit from "express-rate-limit";
 
 const limitReached = (req, res) => {
-  console.log(req);
-  console.log(res);
   res.status(429).json({ message: "Too many requests. Try again later." });
 };
 

@@ -58,11 +58,12 @@ export const updateSauce = (req, res) => {
 
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      if (sauce.userId !== req.auth.userId) {
+      const { userId, imageUrl } = sauce;
+      if (userId !== req.auth.userId) {
         res.status(403).json({ message: "Unauthorized !!!" });
       } else {
         /* This is deleting the old image from the server. */
-        const oldImage = sauce.imageUrl.split("/images/")[1];
+        const oldImage = imageUrl.split("/images/")[1];
         if (req.file) {
           fs.rm(`images/${oldImage}`, (err) => {
             if (err) {
@@ -90,17 +91,22 @@ export const updateSauce = (req, res) => {
 export const deleteSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      if (sauce.userId !== req.auth.userId) {
+      const { userId, imageUrl } = sauce;
+      if (userId !== req.auth.userId) {
         res.status(403).json({ message: "Non autorisé !" });
       } else {
-        const filename = sauce.imageUrl.split("/images/")[1];
-        fs.rm(`images/${filename}`, () => {
+        const filename = imageUrl.split("/images/")[1];
+        fs.rm(`images/${filename}`, (err) => {
+          if (err) {
+            return res.status(409).json({ message: "impossible de supprimer l'image" })
+          }
           Sauce.deleteOne({ _id: req.params.id })
             .then(() =>
               res.status(200).json({ message: "Sauce successfully removed." })
             )
             .catch((error) => res.status(500).json({ error }));
         });
+
       }
     })
     .catch((error) => res.status(500).json({ error }));
@@ -108,11 +114,11 @@ export const deleteSauce = (req, res) => {
 
 export const likeSauce = (req, res) => {
   const { like } = req.body;
-
   if (like === 0) {
     Sauce.findOne({ _id: req.params.id })
       .then((sauce) => {
-        if (sauce.usersLiked.includes(req.body.userId)) {
+        const { usersLiked, usersDisliked } = sauce;
+        if (usersLiked.includes(req.body.userId)) {
           Sauce.updateOne(
             { _id: req.params.id },
             {
@@ -123,7 +129,7 @@ export const likeSauce = (req, res) => {
             .then(() => res.status(200).json({ message: "null" }))
             .catch((error) => res.status(500).json({ error }));
         }
-        if (sauce.usersDisliked.includes(req.body.userId)) {
+        if (usersDisliked.includes(req.body.userId)) {
           Sauce.updateOne(
             { _id: req.params.id },
             {

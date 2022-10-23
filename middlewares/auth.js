@@ -12,7 +12,6 @@ export const authorization = (req, res, next) => {
     jwt.verify(
       token,
       `${process.env.TOKEN_SECRET}`,
-      { expiresIn: "24h" },
       (err, decoded) => {
         if (err) {
           console.error("error token");
@@ -24,7 +23,7 @@ export const authorization = (req, res, next) => {
         }
       }
     );
-  } catch (e) {
-    res.status(401).json({ e });
+  } catch (error) {
+    res.status(401).json({ error });
   }
 };

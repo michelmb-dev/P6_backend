@@ -2,5 +2,5 @@
 
 ## TODO
 
-- Cookie-session
-- gestion erreur suppression image (voir todo)
+- trim request
+- sanitize

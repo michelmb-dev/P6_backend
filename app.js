@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import * as fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import mongoSanitize from "express-mongo-sanitize";
 
 /* Import Routes */
 import { authRoutes } from "./routes/authRoutes.js";
@@ -46,10 +47,11 @@ ConnectDB(
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(mongoSanitize());
 
 /* Allows the server to accept requests from any origin. ( CORS ) */
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
@@ -78,8 +80,8 @@ fs.access("images", function (notAccess) {
 });
 
 /* Routes */
-app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/api/auth", authRoutes);
 app.use("/api/sauces", saucesRoutes);
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 export default app;
