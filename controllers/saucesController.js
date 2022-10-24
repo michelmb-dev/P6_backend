@@ -1,7 +1,12 @@
 import { Sauce } from "../models/Sauce.js";
 import * as fs from "fs";
+import {sauceFormValidation} from "../utils/validation.js";
 
 export const createSauce = (req, res) => {
+
+  const { error } = sauceFormValidation(req.body)
+  if (error) return res.status(400).json({message: error.message})
+
   const { sauce } = req.body;
   const sauceObject = JSON.parse(sauce);
   delete sauceObject._id;
@@ -9,9 +14,7 @@ export const createSauce = (req, res) => {
   const newSauce = new Sauce({
     ...sauceObject,
     userId: req.auth.userId,
-    imageUrl: `${req.protocol}://${req.get("host")}/images/${
-      req.file.filename
-    }`,
+    imageUrl: `${req.protocol}://${req.get("host")}/images/${ req.file.filename }`,
     likes: 0,
     dislikes: 0,
     usersLiked: [],
@@ -45,6 +48,10 @@ export const getSauce = (req, res) => {
 };
 
 export const updateSauce = (req, res) => {
+
+  const { error } = sauceFormValidation(req.body)
+  if (error) return res.status(400).json({message: error.message})
+
   const { sauce } = req.body;
 
   const sauceObject = req.file

@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { User } from "../models/User.js";
 import jwt from "jsonwebtoken";
+import {authFormValidation} from "../utils/validation.js";
 
 /**
  * It creates a new user, hashes the password, saves the user in the database, and returns a 201 status code with a message
@@ -9,8 +10,11 @@ import jwt from "jsonwebtoken";
  * @param res - the response object
  */
 export const signup = (req, res) => {
-  bcrypt
-    .hash(req.body.password, 10)
+
+  const { error } = authFormValidation(req.body)
+  if (error) return res.status(400).json({message: error.message})
+
+  bcrypt.hash(req.body.password, 10)
     .then((hash) => {
       const user = new User({
         email: req.body.email,
@@ -31,6 +35,10 @@ export const signup = (req, res) => {
  * @param res - the response object
  */
 export const login = (req, res) => {
+
+  const { error } = authFormValidation(req.body)
+  if (error) return res.status(400).json({message: error.message})
+
   User.findOne({ email: req.body.email })
     .then((user) => {
       if (!user) {

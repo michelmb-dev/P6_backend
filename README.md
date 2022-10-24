@@ -2,5 +2,5 @@
 
 ## TODO
 
-- trim request
 - sanitize
+- erreur suppression ancienne image lors de l'update
