@@ -4,14 +4,11 @@ import dotenv from "dotenv";
 import * as fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { ConnectDB } from "./config/database.js";
 import mongoSanitize from "express-mongo-sanitize";
-
-/* Import Routes */
 import { authRoutes } from "./routes/authRoutes.js";
 import { saucesRoutes } from "./routes/saucesRoutes.js";
-
-/* Import MongoDB connection */
-import { ConnectDB } from "./config/database.js";
+import {limiter} from "./middlewares/rateLimit.js";
 
 /* fix filename and dirname for type module nodejs */
 const __filename = fileURLToPath(import.meta.url);
@@ -22,6 +19,30 @@ dotenv.config({ path: ".env" });
 
 /* Create a new instance of express */
 const app = express();
+
+/* Set security HTTP headers */
+app.use(helmet());
+
+/* Parse json request body */
+app.use(express.json());
+
+/* Parse urlEncoded request body */
+app.use(express.urlencoded({ extended: true }));
+
+/* Sanitize request data */
+app.use(mongoSanitize())
+
+/* Applying the limiter on only the route that starts with /api */
+app.use('/api', limiter);
+
+/* Allows the server to accept requests from any origin. ( CORS ) */
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+  res.setHeader("Cross-Origin-Resource-Policy", "same-site");
+  next();
+});
 
 /* Connection to Database */
 ConnectDB(
@@ -36,33 +57,12 @@ ConnectDB(
   .catch((err) => {
     console.log(
       "[mongoDb] Failed to connect !!! --> " +
-        [err.message] +
-        " code:" +
-        err.code
+      [err.message] +
+      " code:" +
+      err.code
     );
     process.exit(1);
   });
-
-/* Middlewares */
-app.use(helmet());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(mongoSanitize());
-
-/* Allows the server to accept requests from any origin. ( CORS ) */
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  );
-  res.setHeader("Cross-Origin-Resource-Policy", "same-site");
-  next();
-});
 
 /* Checks if the Images folder exists, if not creates this folder .*/
 fs.access("images", function (notAccess) {

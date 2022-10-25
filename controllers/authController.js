@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { User } from "../models/User.js";
 import jwt from "jsonwebtoken";
-import {authFormValidation} from "../utils/validation.js";
+import {authFormValidation} from "../middlewares/validation.js";
 
 /**
  * It creates a new user, hashes the password, saves the user in the database, and returns a 201 status code with a message

@@ -1,15 +1,15 @@
 import { Sauce } from "../models/Sauce.js";
 import * as fs from "fs";
-import {sauceFormValidation} from "../utils/validation.js";
+import {sauceFormValidation} from "../middlewares/validation.js";
 
 export const createSauce = (req, res) => {
-
-  const { error } = sauceFormValidation(req.body)
-  if (error) return res.status(400).json({message: error.message})
 
   const { sauce } = req.body;
   const sauceObject = JSON.parse(sauce);
   delete sauceObject._id;
+
+  const { error } = sauceFormValidation(sauceObject)
+  if (error) return res.status(400).json({message: error.message})
 
   const newSauce = new Sauce({
     ...sauceObject,
@@ -49,11 +49,7 @@ export const getSauce = (req, res) => {
 
 export const updateSauce = (req, res) => {
 
-  const { error } = sauceFormValidation(req.body)
-  if (error) return res.status(400).json({message: error.message})
-
   const { sauce } = req.body;
-
   const sauceObject = req.file
     ? {
         ...JSON.parse(sauce),
@@ -62,6 +58,9 @@ export const updateSauce = (req, res) => {
         }`,
       }
     : { ...req.body };
+
+  const { error } = sauceFormValidation(sauceObject)
+  if (error) return res.status(400).json({message: error.message})
 
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
@@ -74,9 +73,7 @@ export const updateSauce = (req, res) => {
         if (req.file) {
           fs.rm(`images/${oldImage}`, (err) => {
             if (err) {
-              // File deletion failed
-              // TODO => gérer l'erreur de suppression d'image
-              console.error("Error while removing the image");
+              res.status(409).json({ message: "Error, the old image can't be deleted !!!" })
             }
           });
         }
@@ -105,7 +102,7 @@ export const deleteSauce = (req, res) => {
         const filename = imageUrl.split("/images/")[1];
         fs.rm(`images/${filename}`, (err) => {
           if (err) {
-            return res.status(409).json({ message: "impossible de supprimer l'image" })
+            res.status(409).json({ message: "Error, the image can't be deleted !!!" })
           }
           Sauce.deleteOne({ _id: req.params.id })
             .then(() =>
