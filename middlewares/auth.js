@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 
 /**
  * Get the token from the request header and then verifies the token used.
+ *
  * @param req - The request object.
  * @param res - the response object
  * @param next - This is a callback function that is called when the middleware is complete.
