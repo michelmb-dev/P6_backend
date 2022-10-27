@@ -15,7 +15,9 @@ export const authorization = (req, res, next) => {
       `${process.env.TOKEN_SECRET}`,
       (err, decoded) => {
         if (err) {
-          console.error("error token");
+          req.auth = null;
+          // TODO Voir pour le code status
+          res.status(401).json({ message: "Your session as expired, please to reconnect !!!" });
         } else {
           req.auth = {
             userId: decoded.userId,
