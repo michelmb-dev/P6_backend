@@ -11,7 +11,7 @@ export const createSauce = (req, res) => {
   const { error } = sauceFormValidation(sauceObject)
   if (error) return res.status(400).json({message: error.message})
 
-  const sauceValidateObject = sauceFormValidation(sauceObject);
+  const sauceValidateObject = sauceFormValidation(sauceObject).value;
 
   const newSauce = new Sauce({
     ...sauceValidateObject,
@@ -64,7 +64,7 @@ export const updateSauce = (req, res) => {
   const { error } = sauceFormValidation(sauceObject)
   if (error) return res.status(400).json({message: error.message})
 
-  const sauceValidateObject = sauceFormValidation(sauceObject);
+  const sauceValidateObject = sauceFormValidation(sauceObject).value;
 
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {

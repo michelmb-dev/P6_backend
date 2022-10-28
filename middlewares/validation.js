@@ -13,7 +13,7 @@ export const authFormValidation = (data) => {
 		email: Joi.string().trim().email().required(),
 		password: Joi.string().trim().regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/).message("The password must contain at least one Capital letter, 1 digit and a minimum length of 8 characters.").required()
 	})
-	return schema.validate(data).value
+	return schema.validate(data)
 }
 
 /**
@@ -52,5 +52,6 @@ export const sauceFormValidation = (data) => {
 		mainPepper: customJoi.string().trim().min(3).max(32).htmlStrip().required(),
 		heat: customJoi.number().integer().min(1).max(10).required()
 	})
-	return schema.validate(data).value
+
+	return schema.validate(data)
 }
