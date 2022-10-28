@@ -11,8 +11,10 @@ export const createSauce = (req, res) => {
   const { error } = sauceFormValidation(sauceObject)
   if (error) return res.status(400).json({message: error.message})
 
+  const sauceValidateObject = sauceFormValidation(sauceObject);
+
   const newSauce = new Sauce({
-    ...sauceObject,
+    ...sauceValidateObject,
     userId: req.auth.userId,
     imageUrl: `${req.protocol}://${req.get("host")}/images/${ req.file.filename }`,
     likes: 0,
@@ -62,6 +64,8 @@ export const updateSauce = (req, res) => {
   const { error } = sauceFormValidation(sauceObject)
   if (error) return res.status(400).json({message: error.message})
 
+  const sauceValidateObject = sauceFormValidation(sauceObject);
+
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       const { userId, imageUrl } = sauce;
@@ -79,7 +83,7 @@ export const updateSauce = (req, res) => {
         }
         Sauce.updateOne(
           { _id: req.params.id },
-          { ...sauceObject, _id: req.params.id }
+          { ...sauceValidateObject, _id: req.params.id }
         )
           .then(() =>
             res.status(200).json({ message: "Sauce updated successfully." })

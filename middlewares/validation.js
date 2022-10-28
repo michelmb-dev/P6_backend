@@ -1,4 +1,6 @@
 import Joi from "joi";
+import sanitizeHtml from "sanitize-html";
+
 
 /**
  * Validate a form authentification.
@@ -11,24 +13,44 @@ export const authFormValidation = (data) => {
 		email: Joi.string().trim().email().required(),
 		password: Joi.string().trim().regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/).message("The password must contain at least one Capital letter, 1 digit and a minimum length of 8 characters.").required()
 	})
-	return schema.validate(data)
+	return schema.validate(data).value
 }
+
+/**
+ * Create extension for sanitize html tag
+ */
+const customJoi = Joi.extend((Joi) => {
+	return {
+		type: "string",
+		base: Joi.string(),
+		rules: {
+			htmlStrip: {
+				validate(value) {
+					return sanitizeHtml(value, {
+						allowedTags: [],
+						allowedAttributes: {},
+					});
+				},
+			},
+		},
+	};
+});
 
 /**
  * Validate a form sauce.
  *
  * @param {object} data
- * @returns {Joi.ValidationResult}
+ * @returns {customJoi.ValidationResult}
  */
 export const sauceFormValidation = (data) => {
-	const schema = Joi.object({
-		userId: Joi.string().required(),
-		name: Joi.string().trim().min(3).max(64).required(),
-		manufacturer: Joi.string().trim().min(3).max(32).required(),
-		description: Joi.string().trim().min(6).required(),
-		imageUrl: Joi.string().uri().optional(),
-		mainPepper: Joi.string().trim().min(3).max(32).required(),
-		heat: Joi.number().integer().min(1).max(10).required()
+	const schema = customJoi.object({
+		userId: customJoi.string().required(),
+		name: customJoi.string().trim().min(3).max(64).htmlStrip().required(),
+		manufacturer: customJoi.string().trim().min(3).max(32).htmlStrip().required(),
+		description: customJoi.string().trim().min(6).htmlStrip().required(),
+		imageUrl: customJoi.string().uri().optional(),
+		mainPepper: customJoi.string().trim().min(3).max(32).htmlStrip().required(),
+		heat: customJoi.number().integer().min(1).max(10).required()
 	})
-	return schema.validate(data)
+	return schema.validate(data).value
 }
