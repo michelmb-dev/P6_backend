@@ -30,7 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* Sanitize request data */
-app.use(mongoSanitize())
+app.use(mongoSanitize());
 
 /* Applying the limiter on only the route that starts with /api */
 app.use('/api', limiter);
@@ -45,22 +45,10 @@ app.use((req, res, next) => {
 });
 
 /* Connection to Database */
-ConnectDB(
-  process.env.USER_DB,
-  process.env.PASS_DB,
-  process.env.SERVER_DB,
-  process.env.NAME_DB
-)
-  .then(() =>
-    console.log("[mongoDb] Connected to database : " + process.env.NAME_DB)
-  )
+ConnectDB(process.env.USER_DB, process.env.PASS_DB, process.env.SERVER_DB,process.env.NAME_DB)
+  .then(() => console.log("[mongoDb] Connected to database : " + process.env.NAME_DB))
   .catch((err) => {
-    console.log(
-      "[mongoDb] Failed to connect !!! --> " +
-      [err.message] +
-      " code:" +
-      err.code
-    );
+    console.log("[mongoDb] Failed to connect !!! --> " + [err.message] + " code:" + err.code);
     process.exit(1);
   });
 

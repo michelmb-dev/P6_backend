@@ -3,11 +3,12 @@ import { User } from "../models/User.js";
 import jwt from "jsonwebtoken";
 import {authFormValidation} from "../middlewares/validation.js";
 
+
 /**
- * It creates a new user, hashes the password, saves the user in the database, and returns a 201 status code with a message
- * if everything went well
- * @param req - the request object, which contains all the information about the request that was made to the server.
- * @param res - the response object
+ * It creates a new user, hashes the password, saves the user in the database.
+ *
+ * @param {Object} req - the request object, which contains all the information about the request that was made to the server.
+ * @param {Object} res - the response object
  */
 export const signup = (req, res) => {
 
@@ -29,10 +30,10 @@ export const signup = (req, res) => {
 };
 
 /**
- * It checks if the user exists in the database, if it does, it compares the password sent by the user with the one stored
- * in the database, if they match, it sends back a token
- * @param req - the request object
- * @param res - the response object
+ * It checks if the user exists in the database, if it does, it compares the password sent by the user with the one stored in the database, if they match, it sends back a token.
+ *
+ * @param {Object} req - the request object
+ * @param {Object} res - the response object
  */
 export const login = (req, res) => {
 
@@ -44,8 +45,10 @@ export const login = (req, res) => {
       if (!user) {
         return res.status(401).json({ error: "The user does not exist !!!" });
       }
+
+      const { password } = user;
       bcrypt
-        .compare(req.body.password, user.password)
+        .compare(req.body.password, password)
         .then((valid) => {
           if (!valid) {
             return res.status(401).json({ message: "Incorrect password !!!" });

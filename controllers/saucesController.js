@@ -2,6 +2,12 @@ import { Sauce } from "../models/Sauce.js";
 import * as fs from "fs";
 import {sauceFormValidation} from "../middlewares/validation.js";
 
+/**
+ * It creates a new sauce in the database.
+ *
+ * @param {Object} req - the request object
+ * @param {Object} res - the response object
+ */
 export const createSauce = (req, res) => {
 
   const { sauce } = req.body;
@@ -31,12 +37,25 @@ export const createSauce = (req, res) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
+
+/**
+ * It finds all the sauces in the database and returns them in a JSON format.
+ *
+ * @param {Object} req - the request object
+ * @param {Object} res - the response object that will be sent back to the client
+ */
 export const getAllSauces = (req, res) => {
   Sauce.find()
     .then((sauces) => res.status(200).json(sauces))
     .catch((error) => res.status(500).json({ error: error }));
 };
 
+
+/**
+ * It finds a sauce in the database by its id and returns it
+ * @param {Object} req - the request object
+ * @param {Object} res - the response object
+ */
 export const getSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
@@ -49,8 +68,14 @@ export const getSauce = (req, res) => {
     .catch((error) => res.status(500).json({ error: error }));
 };
 
-export const updateSauce = (req, res) => {
 
+/**
+ * Update the sauce in the database.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - the response object.
+ */
+export const updateSauce = (req, res) => {
   const { sauce } = req.body;
   const sauceObject = req.file
     ? {
@@ -96,6 +121,11 @@ export const updateSauce = (req, res) => {
     });
 };
 
+/**
+ * It deletes the sauce from the database and the image from the server.
+ * @param {Object} req - the request object
+ * @param {Object} res - the response object
+ */
 export const deleteSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
@@ -114,14 +144,21 @@ export const deleteSauce = (req, res) => {
             )
             .catch((error) => res.status(500).json({ error }));
         });
-
       }
     })
     .catch((error) => res.status(500).json({ error }));
 };
 
+
+/**
+ * It updates the sauce is likes and dislikes based on the user is input.
+ *
+ * @param {Object} req - the request object
+ * @param {Object} res - the response object
+ */
 export const likeSauce = (req, res) => {
   const { like } = req.body;
+
   if (like === 0) {
     Sauce.findOne({ _id: req.params.id })
       .then((sauce) => {

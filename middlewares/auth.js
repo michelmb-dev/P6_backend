@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 /**
  * Get the token from the request header and then verifies the token used.
  *
- * @param req - The request object.
- * @param res - the response object
+ * @param {Object} req - The request object.
+ * @param {Object} res - the response object
  * @param next - This is a callback function that is called when the middleware is complete.
  */
 export const authorization = (req, res, next) => {
@@ -16,7 +16,6 @@ export const authorization = (req, res, next) => {
       (err, decoded) => {
         if (err) {
           req.auth = null;
-          // TODO Voir pour le code status
           res.status(401).json({ message: "Your session as expired, please to reconnect !!!" });
         } else {
           req.auth = {

@@ -1,5 +1,11 @@
 import rateLimit from "express-rate-limit";
 
+/**
+ * If the user makes too many requests, they will get a 429 status code and a message saying "Too many requests, please try
+ * again in an hour!"
+ * @param {Object} req - The request object.
+ * @param {Object} res - the response object
+ */
 const limitReached = (req, res) => {
   res.status(429).json({ message: "Too many requests, please try again in an hour!" });
 };
